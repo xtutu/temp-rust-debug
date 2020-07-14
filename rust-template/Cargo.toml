@@ -1,0 +1,38 @@
+[package]
+name = "rust-template"
+version = "0.1.0"
+authors = ["linyongxing <xtutu0202@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+default-run = "rust-template"
+
+#[profile.dev]
+#overflow-checks = false # Wrapping
+
+[profile.release]
+opt-level = 'z'  # 默认的 release 优化等级为 3，这个等级下编译器会进行循环展开之类的操作以体积膨胀为代价提高程序运行速度。不过这次我们在优化体积，我们不需要以体积为代价的优化。因为我们调整优化等级为 z，意为最小二进制体积：
+lto = true
+panic = 'abort'
+codegen-units = 1
+
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.8"
+chrono = "0.4"
+lazy_static = "1.4"
+log = "0.4"
+log4rs = "0.11"
+byteorder = "1"
+bstr = {version = "0.2", features = ["std"], default_features = false }
+#tokio = { version = "0.2", features = ["full"] }
+tokio = { version = "0.2", features = ["rt-core", "net", "time", "sync", "io-util", "macros", "signal"] }  # 100k
+tokio-util = {version = "0.3.1", features = ["codec"]}
+#tokio_util = "0.3.1"
+rlua = { path = "rlua"}
+futures = "0.3"
+rustyline = "6.0.0"
+walkdir = "2"
+lz4 = "1.23.1"
