@@ -4,7 +4,8 @@
 #![allow(unused_imports)]
 
 #[macro_use]
-mod xkit;
+extern crate xkit;
+
 mod conf;
 mod lua_util;
 mod core;
@@ -25,9 +26,9 @@ use tokio::sync::mpsc;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     let result = init();
-    if let Err(e) = result{
+    if let Err(e) = result {
         log::error!("{}", e);
-        return Err(e)
+        return Err(e);
     }
     //
     {
@@ -52,10 +53,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
             let name = "name-".to_string().add(&i.to_string());
             let start = xkit::time_util::get_current_millisecond();
             let mut agent = agent::LuaAgent::new(name.clone());
+
+
             let end = xkit::time_util::get_current_millisecond();
             log::debug!("init finished {}/{}   cost:{}", i, count, end - start);
-            let result =  agent.run();
-            if let Err(e)  = result{
+            let result = agent.run();
+            if let Err(e) = result {
                 log::error!("{}", e);
             }
             state.add(name, agent.sender.clone());
@@ -78,7 +81,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     return Ok(());
 }
 
-fn init()-> Result<(), Box<dyn Error>> {
+fn init() -> Result<(), Box<dyn Error>> {
     let root_path = "./";
 
     // init log4rs

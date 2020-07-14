@@ -1,4 +1,5 @@
 use rlua::{Function, Lua, MetaMethod, Result, UserData, UserDataMethods, Variadic, Error, MultiValue};
+use bstr::BString;
 
 // #[derive(Copy, Clone)]
 // struct LuaLog();
@@ -22,7 +23,15 @@ pub fn register(context: rlua::Context) {
     let globals = context.globals();
 
     {
-        let fn_debug = context.create_function::<String, (), _>(|_context, msg| {
+        let fn_trace = context.create_function::<BString, (), _>(|_context, msg| {
+            log::trace!(target:"lua", "{}", msg);
+            Ok(())
+        }).expect("fn_trace error");
+        globals.set("fn_trace", fn_trace).unwrap();
+    }
+
+    {
+        let fn_debug = context.create_function::<BString, (), _>(|_context, msg| {
             log::debug!(target:"lua", "{}", msg);
             Ok(())
         }).expect("fn_debug error");
@@ -30,7 +39,7 @@ pub fn register(context: rlua::Context) {
     }
 
     {
-        let fn_info = context.create_function::<String, (), _>(|_context, msg| {
+        let fn_info = context.create_function::<BString, (), _>(|_context, msg| {
             log::info!(target:"lua", "{}", msg);
             Ok(())
         }).expect("fn_info error");
@@ -39,7 +48,7 @@ pub fn register(context: rlua::Context) {
 
 
     {
-        let fn_warn = context.create_function::<String, (), _>(|_context, msg| {
+        let fn_warn = context.create_function::<BString, (), _>(|_context, msg| {
             log::warn!(target:"lua", "{}", msg);
             Ok(())
         }).expect("fn_warn error");
@@ -47,7 +56,7 @@ pub fn register(context: rlua::Context) {
     }
 
     {
-        let fn_error = context.create_function::<String, (), _>(|_context, msg| {
+        let fn_error = context.create_function::<BString, (), _>(|_context, msg| {
             log::error!(target:"lua", "{}", msg);
             Ok(())
         }).expect("fn_error error");

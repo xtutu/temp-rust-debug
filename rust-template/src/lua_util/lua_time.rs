@@ -1,4 +1,4 @@
-use crate::xkit::time_util;
+use xkit::time_util;
 pub fn register(context: rlua::Context) {
     let globals = context.globals();
     let table_time_util = context.create_table().unwrap();

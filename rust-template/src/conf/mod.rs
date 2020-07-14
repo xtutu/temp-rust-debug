@@ -3,7 +3,7 @@ use std::sync::{Mutex, Arc, RwLock};
 use std::{fs, path};
 use serde_yaml::Value;
 use lazy_static::lazy_static;
-use crate::xkit;
+use xkit;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Default)]
 pub struct Conf {

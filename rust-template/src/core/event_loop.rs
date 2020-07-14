@@ -19,7 +19,7 @@ pub fn main_loop(mut rx : mpsc::UnboundedReceiver::<channel_msg::Msg>)->JoinHand
     log::info!("mainloop start");
     let ret = tokio::spawn(async move {
         // let rx = rx;
-        let mut interval = time::interval(Duration::from_millis(5000));
+        let mut interval = time::interval(Duration::from_millis(10));
         loop {
 
             // 通过 channel， 居然不是在一个线程里执行！

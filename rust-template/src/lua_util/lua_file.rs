@@ -1,8 +1,10 @@
-use crate::xkit::file_util;
+use xkit::file_util;
 use futures::io::Error;
 use rlua::Table;
 use bstr::{BString, BStr};
 use bstr::{ByteSlice, ByteVec};
+use std::path::Path;
+
 pub fn register(context: rlua::Context) {
     let globals = context.globals();
     let lua_file_util_table = context.create_table().unwrap();
@@ -12,8 +14,12 @@ pub fn register(context: rlua::Context) {
             // file_util::load_file_byte(file_path).map_err(|_|{
             //     rlua::Error::UserDataBorrowMutError
             // })
-            let x = file_util::load_file_byte(file_path).unwrap();
-            Ok(BString::from(x))
+            let ret = file_util::load_file_byte(file_path);
+            if let Err(e)  = ret{
+                log::error!("err {}", e);
+                return Ok(BString::from(""));
+            }
+            Ok(BString::from(ret.unwrap()))
 
         }).expect("load_file error");
 
@@ -23,7 +29,7 @@ pub fn register(context: rlua::Context) {
         //         rlua::Error::UserDataBorrowMutError
         //     })
         // }).expect("load_file error");
-        lua_file_util_table.set("load_file_byte", load_file_byte).unwrap();
+        lua_file_util_table.set("loadFileByte", load_file_byte).unwrap();
     }
 
     {
@@ -32,7 +38,15 @@ pub fn register(context: rlua::Context) {
                 rlua::Error::UserDataBorrowMutError
             })
         }).expect("load_file error");
-        lua_file_util_table.set("load_file_string", load_file_string).unwrap();
+        lua_file_util_table.set("loadFileString", load_file_string).unwrap();
+    }
+
+    {
+        let fn_is_exist = context.create_function::<String, bool, _>(|_context, path| -> Result<bool, _> {
+            // file_util::isExist()
+            Ok(Path::new(&path).exists())
+        }).expect("isExist error");
+        lua_file_util_table.set("isExist", fn_is_exist).unwrap();
     }
 
     globals.set("__file_util", lua_file_util_table).unwrap();

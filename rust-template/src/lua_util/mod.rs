@@ -3,6 +3,8 @@ mod lua_log;
 mod lua_file;
 mod lua_time;
 mod lua_xt;
+mod lua_network;
+mod lua_http;
 
 pub use lua_test::try_lua;
 pub use lua_test::try_lua3;
@@ -13,10 +15,10 @@ use rlua::{Function, Lua, MetaMethod, Result, UserData, UserDataMethods, Variadi
 use std::process::Command;
 use std::path::PathBuf;
 use std::path;
-use crate::xkit;
+use xkit;
 use std::sync::{Mutex, RwLock};
 use crate::conf;
-use crate::xkit::file_util::format_path;
+use xkit::file_util::format_path;
 
 pub fn new_lua_state(uuid_string: String) -> Lua {
     let lua = unsafe {
@@ -40,6 +42,8 @@ pub fn new_lua_state(uuid_string: String) -> Lua {
         lua_file::register(context);
         lua_time::register(context);
         lua_xt::register(context);
+        lua_network::register(context);
+        lua_http::register(context)
     });
 
     lua
@@ -56,15 +60,15 @@ pub fn do_require_file(context: rlua::Context, mut module_name: String) {
 }
 
 lazy_static! {
-    static ref cache_lua_map : RwLock<HashMap::<String, Vec::<u8>>>= {
+    static ref CACHE_LUA_MAP : RwLock<HashMap::<String, Vec::<u8>>>= {
         let mut m = HashMap::new();
         RwLock::new(m)
     };
 }
 
 pub fn do_require_file_by_cache(context: rlua::Context, mut module_name: String) {
-    // let cache_lua_map: HashMap::<string, Vec::<u8>>= HashMap::new();
-    let mut cache_lua_map_temp = cache_lua_map.write().unwrap();
+    // let CACHE_LUA_MAP: HashMap::<string, Vec::<u8>>= HashMap::new();
+    let mut cache_lua_map_temp = CACHE_LUA_MAP.write().unwrap();
     let cfg = conf::ins().read().unwrap();
 
     let full_path = path::Path::new(&cfg.root_dir).join(get_root_dir().as_str()).join(module_name.clone() + ".lua");
@@ -91,15 +95,15 @@ pub fn do_require_file_by_cache(context: rlua::Context, mut module_name: String)
 
     let result = context.load(data).set_name(&module_name).expect("set name error").exec();
     if let Err(e) = result {
-        log::error!("require lua:{:?} error {:?}", module_name,  e);
+        log::error!("require lua:{:?} error {}", module_name,  e);
         return;
     }
 }
 
 
 // pub fn do_require_file_by_cache(context: rlua::Context, mut module_name: String) {
-//     // let cache_lua_map: HashMap::<string, Vec::<u8>>= HashMap::new();
-//     let mut cache_lua_map_temp = cache_lua_map.lock().unwrap();
+//     // let CACHE_LUA_MAP: HashMap::<string, Vec::<u8>>= HashMap::new();
+//     let mut cache_lua_map_temp = CACHE_LUA_MAP.lock().unwrap();
 //     let cfg = conf::ins().lock().unwrap();
 //     let full_path = path::Path::new(&cfg.root_dir).join("code").join(module_name.clone() + ".lua");
 //     // log::info!("full_path: {:?}", full_path);

@@ -11,14 +11,16 @@ default-run = "rust-template"
 #[profile.dev]
 #overflow-checks = false # Wrapping
 
-[profile.release]
-opt-level = 'z'  # 默认的 release 优化等级为 3，这个等级下编译器会进行循环展开之类的操作以体积膨胀为代价提高程序运行速度。不过这次我们在优化体积，我们不需要以体积为代价的优化。因为我们调整优化等级为 z，意为最小二进制体积：
-lto = true
-panic = 'abort'
-codegen-units = 1
+#[profile.release]
+#opt-level = 'z'  # 默认的 release 优化等级为 3，这个等级下编译器会进行循环展开之类的操作以体积膨胀为代价提高程序运行速度。不过这次我们在优化体积，我们不需要以体积为代价的优化。因为我们调整优化等级为 z，意为最小二进制体积：
+#lto = true
+#panic = 'abort'
+#codegen-units = 1
 
 
 [dependencies]
+xkit = { path = "rust-xkit"}
+
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.8"
 chrono = "0.4"
@@ -28,7 +30,7 @@ log4rs = "0.11"
 byteorder = "1"
 bstr = {version = "0.2", features = ["std"], default_features = false }
 #tokio = { version = "0.2", features = ["full"] }
-tokio = { version = "0.2", features = ["rt-core", "net", "time", "sync", "io-util", "macros", "signal"] }  # 100k
+tokio = { version = "0.2", features = ["rt-core", "net", "time", "sync", "io-util", "macros", "signal", "blocking"] }  # 100k
 tokio-util = {version = "0.3.1", features = ["codec"]}
 #tokio_util = "0.3.1"
 rlua = { path = "rlua"}
@@ -36,3 +38,10 @@ futures = "0.3"
 rustyline = "6.0.0"
 walkdir = "2"
 lz4 = "1.23.1"
+
+
+# 依赖了 Tokio，有点冲突，暂时先不深究了
+#reqwest = { version = "0.10", features = ["blocking"] }
+attohttpc = "0.14.0"
+
+dns-lookup = "1.0.3"

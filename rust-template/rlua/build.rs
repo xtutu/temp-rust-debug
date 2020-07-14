@@ -28,6 +28,9 @@ fn main() {
             config.define("LUA_USE_APICHECK", None);
         }
 
+        config_binding.define("RAPIDJSON_PARSE_DEFAULT_FLAGS", "kParseCommentsFlag");
+
+
         config.define("LUA_LIB", None);
         config
             .include("lua")
